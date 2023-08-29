@@ -205,7 +205,7 @@ int myStrncmp(const char *str1, const char *str2, const size_t n)
 
     size_t seenLast = n - 1;
     size_t i = 0;
-    
+
     while (str2[i] != '\0' && str1[i] == str2[i] && i < seenLast) {
         i++;
     }
@@ -235,6 +235,45 @@ char *myStrstr(char *foundIn, const char *found) //const char
 
     if (found[j] == '\0')
         return foundIn + i;
+
+    return NULL;
+}
+
+char *myStrstrRK(char *foundIn, const char *found) // Rabin-Karp algorithm
+{
+    assert(foundIn);
+    assert(found);
+    assert(found != foundIn);
+
+    int hashStr  =  foundIn[0] % HASH_MOD;
+    int hashPattern = found[0] % HASH_MOD;
+    int firstElemHash = 1;
+
+    size_t patternLength = 0;
+
+    for (size_t i = 0; found[i] != '\0'; i++) {
+        hashStr   =   (hashStr   *   ALPHABET_SIZE + foundIn[i]) % HASH_MOD;
+        hashPattern = (hashPattern * ALPHABET_SIZE  +  found[i]) % HASH_MOD;
+        firstElemHash     =    (firstElemHash  *  ALPHABET_SIZE) % HASH_MOD;
+        patternLength++;
+    }
+
+    if (patternLength == 0)
+        return foundIn;
+
+    for (size_t i = 0; foundIn[i + patternLength - 1] != '\0'; i++) {
+
+        if (hashStr == hashPattern &&
+            myStrncmp(foundIn + i, found, patternLength) == 0) {
+
+            return foundIn + i;
+        }
+        hashStr -= (firstElemHash * foundIn[i]) % HASH_MOD;
+        hashStr += HASH_MOD;
+        hashStr *= ALPHABET_SIZE;
+        hashStr += foundIn[i + patternLength];
+        hashStr %= HASH_MOD;
+    }
 
     return NULL;
 }

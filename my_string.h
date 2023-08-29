@@ -3,6 +3,9 @@
 
 #define sizear(str) sizeof(str)/sizeof(str[0])
 
+const int ALPHABET_SIZE = 256;
+const int HASH_MOD = 10069;
+
 void printStr(char *str, size_t size);
 
 int myPuts(const char *str);
@@ -30,5 +33,7 @@ int myStrcmp(const char *str1, const char *str2);
 int myStrncmp(const char *str1, const char *str2, const size_t n);
 
 char *myStrstr(char *foundIn, const char *found);
+
+char *myStrstrRK(char *foundIn, const char *found);
 
 #endif //MY_STRING_H
