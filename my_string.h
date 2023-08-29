@@ -36,4 +36,6 @@ char *myStrstr(char *foundIn, const char *found);
 
 char *myStrstrRK(char *foundIn, const char *found);
 
+char *myStrstrBMH(char *text, const char *pattern);
+
 #endif //MY_STRING_H

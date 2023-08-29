@@ -277,3 +277,43 @@ char *myStrstrRK(char *foundIn, const char *found) // Rabin-Karp algorithm
 
     return NULL;
 }
+
+char *myStrstrBMH(char *text, const char *pattern) // Boyer-Moore-Horspool algorithm
+{                                                  // only bad-character heuristic used
+    assert(text);
+    assert(pattern);
+    assert(text != pattern);
+
+    if (pattern[0] == '\0')
+        return text;
+
+    int lastOcc[ALPHABET_SIZE];
+    for (size_t i = 0; i < ALPHABET_SIZE; i++) {
+        lastOcc[i] = -1;
+    }
+
+    size_t patternLength = 0;      // it is actually (patternLength - 1)
+    for (size_t i = 0; pattern[i + 1] != '\0'; i++) {
+        lastOcc[int(pattern[i])] = int(i);
+        patternLength++;
+    }
+
+    size_t i = 0;
+    while (text[i + patternLength] != '\0') {
+        int j = int(patternLength);
+        while (text[i + j] == pattern[j]) {
+            j--;
+            if (j == -1) {
+                return text + i;
+            }
+        }
+
+        if (lastOcc[int(text[i + patternLength])] == -1) {
+            i += patternLength + 1;
+        }
+        else {
+            i += lastOcc[int(text[i + patternLength])] + 1;
+        }
+    }
+    return NULL;
+}
