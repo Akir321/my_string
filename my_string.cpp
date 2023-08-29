@@ -188,9 +188,25 @@ int myStrcmp(const char *str1, const char *str2)
     assert(str1);
     assert(str2);
     assert(str1 != str2);
-    
+
     size_t i = 0;
     while (str2[i] != '\0' && str1[i] == str2[i]) {
+        i++;
+    }
+
+    return str1[i] - str2[i];
+}
+
+int myStrncmp(const char *str1, const char *str2, const size_t n)
+{
+    assert(str1);
+    assert(str2);
+    assert(str1 != str2);
+
+    size_t seenLast = n - 1;
+    size_t i = 0;
+    
+    while (str2[i] != '\0' && str1[i] == str2[i] && i < seenLast) {
         i++;
     }
 

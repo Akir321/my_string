@@ -27,6 +27,8 @@ ssize_t myGetline(char **lineptr, size_t *n, FILE *fstream);
 
 int myStrcmp(const char *str1, const char *str2);
 
+int myStrncmp(const char *str1, const char *str2, const size_t n);
+
 char *myStrstr(char *foundIn, const char *found);
 
 #endif //MY_STRING_H
