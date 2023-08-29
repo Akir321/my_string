@@ -196,3 +196,33 @@ int myStrcmp(const char *str1, const char *str2)
         return -1;
     return 0;
 }
+
+char *myStrstr(char *foundIn, const char *found) //const char
+{
+    assert(foundIn);
+    assert(found);
+    assert(foundIn != found);
+
+    if (myStrlen(found) == 0) {
+        return foundIn;
+    }
+
+    size_t i = 0;
+    size_t j = 0;
+
+    while (foundIn[i + j] != '\0' && found[j] != '\0') {
+
+        if (foundIn[i + j] == found[j]) {
+            j++;
+        }
+        else {
+            j = 0;
+            i++;
+        }
+    }
+
+    if (found[j] == '\0')
+        return foundIn + i;
+
+    return NULL;
+}
