@@ -185,16 +185,16 @@ ssize_t myGetline(char **lineptr, size_t *n, FILE *fstream)
 
 int myStrcmp(const char *str1, const char *str2)
 {
+    assert(str1);
+    assert(str2);
+    assert(str1 != str2);
+    
     size_t i = 0;
-    while (str1[i] != '\0' && str2[i] != '\0' && str1[i] == str2[i]) {
+    while (str2[i] != '\0' && str1[i] == str2[i]) {
         i++;
     }
 
-    if (str1[i] > str2[i])
-        return  1;
-    if (str1[i] < str2[i])
-        return -1;
-    return 0;
+    return str1[i] - str2[i];
 }
 
 char *myStrstr(char *foundIn, const char *found) //const char
@@ -202,10 +202,6 @@ char *myStrstr(char *foundIn, const char *found) //const char
     assert(foundIn);
     assert(found);
     assert(foundIn != found);
-
-    if (myStrlen(found) == 0) {
-        return foundIn;
-    }
 
     size_t i = 0;
     size_t j = 0;
