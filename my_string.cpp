@@ -54,6 +54,20 @@ char* myStrchr(char *str, const char symbol)
     return NULL;
 }
 
+const char* myStrconstchr(const char *str, const char symbol) 
+{
+    assert(str);
+
+    int i = 0;
+    while (str[i] != '\0') {
+        if (str[i] == symbol) {
+            return str + i;
+        }
+        i++;
+    }
+    return NULL;
+}
+
 size_t myStrlen(const char *str)
 {
     assert(str);
@@ -318,4 +332,30 @@ char *myStrstrBMH(char *text, const char *pattern) // Boyer-Moore-Horspool algor
         }
     }
     return NULL;
+}
+
+char *myStrtok(char *str, const char *sep)
+{
+    assert(sep);
+    assert(str != sep);
+
+    static char *prevEnd = NULL;
+
+    if (!str) str = prevEnd;
+    if (!str) return NULL;
+
+    while (myStrconstchr(sep, *str)) 
+        str++;
+
+    prevEnd = str;
+
+    while (!myStrconstchr(sep, *prevEnd) && *prevEnd) 
+        prevEnd++;
+    
+    if (*prevEnd == '\0') 
+        prevEnd = NULL;
+    else
+        *prevEnd++ = '\0';
+
+    return str;
 }

@@ -14,6 +14,8 @@ char *myStrcpy(char *dest, const char *src);
 
 char *myStrchr(char *str, const char symbol);
 
+const char* myStrconstchr(const char *str, const char symbol);
+
 size_t myStrlen(const char *str);
 
 char *myStrncpy(char *dest, const char *src, const int n);
@@ -37,5 +39,7 @@ char *myStrstr(char *foundIn, const char *found);
 char *myStrstrRK(char *foundIn, const char *found);
 
 char *myStrstrBMH(char *text, const char *pattern);
+
+char *myStrtok(char *str, const char *sep);
 
 #endif //MY_STRING_H
