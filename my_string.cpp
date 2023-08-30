@@ -40,28 +40,14 @@ char* myStrcpy(char *dest, const char *src)
     return dest;
 }
 
-char* myStrchr(char *str, const char symbol) 
+char* myStrchr(const char *str, char symbol) 
 {
     assert(str);
 
     int i = 0;
     while (str[i] != '\0') {
         if (str[i] == symbol) {
-            return str + i;
-        }
-        i++;
-    }
-    return NULL;
-}
-
-const char* myStrconstchr(const char *str, const char symbol) 
-{
-    assert(str);
-
-    int i = 0;
-    while (str[i] != '\0') {
-        if (str[i] == symbol) {
-            return str + i;
+            return (char*)(str + i);
         }
         i++;
     }
@@ -80,7 +66,7 @@ size_t myStrlen(const char *str)
     return i;
 }
 
-char* myStrncpy(char *dest, const char *src, const int n)
+char* myStrncpy(char *dest, const char *src, int n)
 {
     assert (dest);
     assert(src);
@@ -176,11 +162,12 @@ size_t myGetline(char **lineptr, size_t *n, FILE *fstream)
     size_t i = 0;
     int c = fgetc(fstream);
     while (c != '\n' && c != EOF) {
-        if (i >= *n + 2) {
-            (*n) *= 2;
-            *lineptr = (char *)realloc(*lineptr, *n * sizeof(char));
-            if (*lineptr == NULL)
+        if (i >= *n + TERMINATING_SYMBOLS) {
+            (*n) *= EXPANSION_RATE;
+            *lineptr = (char *)realloc(*lineptr, *n * sizeof(char)); 
+            if (*lineptr == NULL) {
                 return -1;
+            }
         }
         (*lineptr)[i++] = char(c);
         c = fgetc(fstream);
@@ -213,81 +200,89 @@ int myStrcmp(const char *str1, const char *str2)
     return str1[i] - str2[i];
 }
 
-int myStrncmp(const char *str1, const char *str2, const size_t n)
+int myStrncmp(const char *str1, const char *str2, size_t n)
 {
     assert(str1);
     assert(str2);
     assert(str1 != str2);
 
-    size_t seenLast = n - 1;
+    size_t comparedLast = n - 1;
     size_t i = 0;
 
-    while (str2[i] != '\0' && str1[i] == str2[i] && i < seenLast) {
+    while (str1[i] == str2[i]  && str2[i] != '\0' && i < comparedLast) {
         i++;
     }
 
     return str1[i] - str2[i];
 }
 
-char *myStrstr(char *foundIn, const char *found)
+char *myStrstr(char *text, const char *pattern)
 {
-    assert(foundIn);
-    assert(found);
-    assert(foundIn != found);
+    assert(text);
+    assert(pattern);
+    assert(text != pattern);
 
-    size_t i = 0;
-    size_t j = 0;
+    size_t textIter = 0;
+    size_t patIter = 0;
 
-    while (foundIn[i + j] != '\0' && found[j] != '\0') {
-
-        if (foundIn[i + j] == found[j]) {
-            j++;
+    while (text[textIter + patIter] != '\0' && pattern[patIter] != '\0') {
+        if (text[textIter + patIter] == pattern[patIter]) {
+            patIter++;
         }
         else {
-            j = 0;
-            i++;
+            patIter = 0;
+            textIter++;
         }
     }
 
-    if (found[j] == '\0')
-        return foundIn + i;
+    if (pattern[patIter] == '\0') {
+        return text + textIter;
+    }
 
     return NULL;
 }
 
-char *myStrstrRK(char *foundIn, const char *found) // Rabin-Karp algorithm
+int getMod(int num, int mod)
 {
-    assert(foundIn);
-    assert(found);
-    assert(found != foundIn);
+    return (num % mod + mod) % mod;
+}
 
-    int hashStr       = foundIn[0] % HASH_MOD;
-    int hashPattern   = found[0] % HASH_MOD;
+// TODO: tests
+char *myStrstrRK(char *text, const char *pattern) // Rabin-Karp algorithm
+{
+    assert(text);
+    assert(pattern);
+    assert(pattern != text);
+
+    int hashStr       = text[0]    % HASH_MOD;
+    int hashPattern   = pattern[0] % HASH_MOD;
     int firstElemHash = 1;
 
     size_t patternLength = 0;
 
-    for (size_t i = 0; found[i] != '\0'; i++) {
-        hashStr       = (hashStr       * ALPHABET_SIZE + foundIn[i]) % HASH_MOD;
-        hashPattern   = (hashPattern   * ALPHABET_SIZE + found[i]  ) % HASH_MOD;
-        firstElemHash = (firstElemHash * ALPHABET_SIZE             ) % HASH_MOD;
+    // TODO: function for hashing
+    for (size_t i = 0; pattern[i] != '\0'; i++) {
+        hashStr       = (hashStr       * ALPHABET_SIZE + text[i])    % HASH_MOD;
+        hashPattern   = (hashPattern   * ALPHABET_SIZE + pattern[i]) % HASH_MOD;
+        firstElemHash = (firstElemHash * ALPHABET_SIZE)              % HASH_MOD;
         patternLength++;
     }
 
-    if (patternLength == 0)
-        return foundIn;
+    if (patternLength == 0) {
+        return text;
+    }
 
-    for (size_t i = 0; foundIn[i + patternLength - 1] != '\0'; i++) {
+    for (size_t i = 0; text[i + patternLength - 1] != '\0'; i++) {
 
         if (hashStr == hashPattern &&
-            myStrncmp(foundIn + i, found, patternLength) == 0) {
+            myStrncmp(text + i, pattern, patternLength) == 0) {
 
-            return foundIn + i;
+            return text + i;
         }
-        hashStr -= (firstElemHash * foundIn[i]) % HASH_MOD;
-        hashStr += HASH_MOD;
+        hashStr -= (firstElemHash * text[i]) % HASH_MOD;
+        hashStr = getMod(hashStr, HASH_MOD);
         hashStr *= ALPHABET_SIZE;
-        hashStr += foundIn[i + patternLength];
+        hashStr += text[i + patternLength];
         hashStr %= HASH_MOD;
     }
 
@@ -344,18 +339,27 @@ char *myStrtok(char *str, const char *sep)
     if (!str) str = prevEnd;
     if (!str) return NULL;
 
-    while (myStrconstchr(sep, *str)) 
+    // comparing the current symbol in str with every symbol in sep
+    while (myStrchr(sep, *str)) {
         str++;
+    }
 
     prevEnd = str;
 
-    while (!myStrconstchr(sep, *prevEnd) && *prevEnd) 
+    while (!myStrchr(sep, *prevEnd) && *prevEnd != '\0') {
         prevEnd++;
+    }
+        
     
-    if (*prevEnd == '\0') 
+    if (*prevEnd == '\0') {
         prevEnd = NULL;
-    else
+    }
+    else {
         *prevEnd++ = '\0';
+    }
 
     return str;
 }
+
+// kmp ???????????????????
+// prefix function ?????????????
