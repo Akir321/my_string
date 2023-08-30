@@ -18,11 +18,12 @@ int myPuts(const char *str)
 {
     assert(str);
 
-    for (int i = 0; str[i] != '\0'; i++) {
+    int i = 0;
+    for (i = 0; str[i] != '\0'; i++) {
         putchar(str[i]);
     }
     putchar('\n');
-    return 1;
+    return i + 1;
 }
 
 char* myStrcpy(char *dest, const char *src)
@@ -39,13 +40,13 @@ char* myStrcpy(char *dest, const char *src)
     return dest;
 }
 
-char* myStrchr(char *str, char symbol) // const char*
+char* myStrchr(char *str, const char symbol) 
 {
     assert(str);
 
     int i = 0;
     while (str[i] != '\0') {
-        if (str[i] == symbol){
+        if (str[i] == symbol) {
             return str + i;
         }
         i++;
@@ -71,13 +72,17 @@ char* myStrncpy(char *dest, const char *src, const int n)
     assert(src);
     assert(src != dest);
 
+    int lastSymbol = n - 1;
     int i = 0;
-    while (i < n && src[i] != '\0') {
+    while (i < lastSymbol && src[i] != '\0') {
         dest[i] = src[i];
         i++;
     }
 
-    dest[i] = '\0';
+    while (i < n) {
+        dest[i++] = '\0';
+    }
+    
     return dest;
 }
 
@@ -148,7 +153,7 @@ char *myStrdup(const char *str)
     return newStr;
 }
 
-ssize_t myGetline(char **lineptr, size_t *n, FILE *fstream)
+size_t myGetline(char **lineptr, size_t *n, FILE *fstream)
 {
     assert(lineptr);
     assert(n);
@@ -157,29 +162,26 @@ ssize_t myGetline(char **lineptr, size_t *n, FILE *fstream)
     size_t i = 0;
     int c = fgetc(fstream);
     while (c != '\n' && c != EOF) {
-        if (i == *n) {
-            (*n)++;
+        if (i >= *n + 2) {
+            (*n) *= 2;
             *lineptr = (char *)realloc(*lineptr, *n * sizeof(char));
+            if (*lineptr == NULL)
+                return -1;
         }
-        (*lineptr)[i] = char(c);
-        i++;
+        (*lineptr)[i++] = char(c);
         c = fgetc(fstream);
     }
 
     if (c == '\n') {
-        if (*n <= i + 1) {
-            *n = i + 2;
-            *lineptr = (char *)realloc(*lineptr, *n * sizeof(char));
-        }
         (*lineptr)[i++] = '\n';
     }
-    else if (*n <= i) {
-        (*n) = i + 1;
-        *lineptr = (char *)realloc(*lineptr, *n * sizeof(char));
-    }
-    (*lineptr)[i] = '\0';
+    (*lineptr)[i++] = '\0';
 
     if (i == 0) return -1;
+
+    *n = i;
+    *lineptr = (char *)realloc(*lineptr, *n * sizeof(char));
+    
     return *n;
 }
 
@@ -213,7 +215,7 @@ int myStrncmp(const char *str1, const char *str2, const size_t n)
     return str1[i] - str2[i];
 }
 
-char *myStrstr(char *foundIn, const char *found) //const char
+char *myStrstr(char *foundIn, const char *found)
 {
     assert(foundIn);
     assert(found);
@@ -245,16 +247,16 @@ char *myStrstrRK(char *foundIn, const char *found) // Rabin-Karp algorithm
     assert(found);
     assert(found != foundIn);
 
-    int hashStr  =  foundIn[0] % HASH_MOD;
-    int hashPattern = found[0] % HASH_MOD;
+    int hashStr       = foundIn[0] % HASH_MOD;
+    int hashPattern   = found[0] % HASH_MOD;
     int firstElemHash = 1;
 
     size_t patternLength = 0;
 
     for (size_t i = 0; found[i] != '\0'; i++) {
-        hashStr   =   (hashStr   *   ALPHABET_SIZE + foundIn[i]) % HASH_MOD;
-        hashPattern = (hashPattern * ALPHABET_SIZE  +  found[i]) % HASH_MOD;
-        firstElemHash     =    (firstElemHash  *  ALPHABET_SIZE) % HASH_MOD;
+        hashStr       = (hashStr       * ALPHABET_SIZE + foundIn[i]) % HASH_MOD;
+        hashPattern   = (hashPattern   * ALPHABET_SIZE + found[i]  ) % HASH_MOD;
+        firstElemHash = (firstElemHash * ALPHABET_SIZE             ) % HASH_MOD;
         patternLength++;
     }
 
@@ -287,7 +289,7 @@ char *myStrstrBMH(char *text, const char *pattern) // Boyer-Moore-Horspool algor
     if (pattern[0] == '\0')
         return text;
 
-    int lastOcc[ALPHABET_SIZE];
+    int lastOcc[ALPHABET_SIZE] = {};
     for (size_t i = 0; i < ALPHABET_SIZE; i++) {
         lastOcc[i] = -1;
     }

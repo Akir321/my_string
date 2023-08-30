@@ -12,7 +12,7 @@ int myPuts(const char *str);
 
 char *myStrcpy(char *dest, const char *src);
 
-char *myStrchr(char *str, char symbol);
+char *myStrchr(char *str, const char symbol);
 
 size_t myStrlen(const char *str);
 
@@ -26,7 +26,7 @@ char *myFgets(char *str, int n, FILE *fstream);
 
 char *myStrdup(const char *str);
 
-ssize_t myGetline(char **lineptr, size_t *n, FILE *fstream);
+size_t myGetline(char **lineptr, size_t *n, FILE *fstream);
 
 int myStrcmp(const char *str1, const char *str2);
 
