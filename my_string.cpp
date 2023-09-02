@@ -4,7 +4,7 @@
 
 // vs code snippets
 
-void printStr(char *str, size_t size)
+void printStr(const char *str, size_t size)
 {
     assert(str);
 
@@ -68,7 +68,7 @@ size_t myStrlen(const char *str)
 
 char* myStrncpy(char *dest, const char *src, int n)
 {
-    assert (dest);
+    assert(dest);
     assert(src);
     assert(src != dest);
 
@@ -193,7 +193,7 @@ int myStrcmp(const char *str1, const char *str2)
     assert(str1 != str2);
 
     size_t i = 0;
-    while (str2[i] != '\0' && str1[i] == str2[i]) {
+    while (str1[i] == str2[i] && str2[i] != '\0') {
         i++;
     }
 

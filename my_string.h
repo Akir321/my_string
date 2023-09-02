@@ -8,7 +8,7 @@ const int HASH_MOD = 10069;
 const int EXPANSION_RATE = 2;
 const int TERMINATING_SYMBOLS = 2;
 
-void printStr(char *str, size_t size);
+void printStr(const char *str, size_t size);
 
 int myPuts(const char *str);
 
